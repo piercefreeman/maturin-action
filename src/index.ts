@@ -938,16 +938,20 @@ async function innerMain(): Promise<void> {
       manylinux = 'auto'
     }
 
+    console.log('IS LINUX', IS_LINUX)
     if (IS_LINUX) {
       if (manylinux.length > 0 && manylinux !== 'auto') {
         args.unshift('--manylinux', manylinux)
       }
       // User can disable Docker build by set manylinux/container to off
+      console.log('CONTAINER', container)
       if (container !== 'off') {
         if (container.length > 0) {
+          console.log('USE DOCKER TRUE')
           useDocker = true
         } else {
           useDocker = manylinux.length > 0 && manylinux !== 'off'
+          console.log('USE DOCKER VAL', useDocker)
         }
       }
     }
@@ -961,6 +965,7 @@ async function innerMain(): Promise<void> {
   args.unshift(command)
 
   let exitCode: number
+  console.log('USE DOCKER', useDocker)
   if (useDocker) {
     const dockerContainer = await getDockerContainer(
       target,

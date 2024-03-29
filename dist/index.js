@@ -12095,16 +12095,20 @@ async function innerMain() {
             !(target.includes('x86_64') || target.includes('i686'))) {
             manylinux = 'auto';
         }
+        console.log('IS LINUX', IS_LINUX);
         if (IS_LINUX) {
             if (manylinux.length > 0 && manylinux !== 'auto') {
                 args.unshift('--manylinux', manylinux);
             }
+            console.log('CONTAINER', container);
             if (container !== 'off') {
                 if (container.length > 0) {
+                    console.log('USE DOCKER TRUE');
                     useDocker = true;
                 }
                 else {
                     useDocker = manylinux.length > 0 && manylinux !== 'off';
+                    console.log('USE DOCKER VAL', useDocker);
                 }
             }
         }
@@ -12115,6 +12119,7 @@ async function innerMain() {
     const maturinRelease = await findVersion(args);
     args.unshift(command);
     let exitCode;
+    console.log('USE DOCKER', useDocker);
     if (useDocker) {
         const dockerContainer = await getDockerContainer(target, manylinux, container);
         if (dockerContainer) {
