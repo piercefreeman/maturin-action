@@ -450,6 +450,16 @@ function xdg_config_home(): string {
   return `${os.homedir()}/.config`
 }
 
+function commandMatchesBase(command: string, searchBase: string) {
+  /*
+   * Validates that a user entered command matches the base command. This allows
+   * users to specify additional modifier tags to the command, such as `-vv` without
+   * losing the default logic the action has to determine what kind of build to complete.
+   */
+  const chunks = command.split(' ')
+  return chunks.length > 0 && chunks[0] === searchBase
+}
+
 function getBeforeScript(): string {
   // Only Linux is supported for now
   if (IS_LINUX) {
@@ -923,9 +933,12 @@ async function innerMain(): Promise<void> {
   let useDocker = false
   // Only build and publish commands has --manylinux and --target options
   let manylinux = core.getInput('manylinux').replace(/^manylinux_?/, '')
-  if (['build', 'publish'].includes(command)) {
+  if (
+    commandMatchesBase(command, 'build') ||
+    commandMatchesBase(command, 'publish')
+  ) {
     // manylinux defaults to auto for the publish command
-    if (command === 'publish' && !manylinux) {
+    if (commandMatchesBase(command, 'publish') && !manylinux) {
       manylinux = 'auto'
     }
     // manylinux defaults to auto if cross compiling

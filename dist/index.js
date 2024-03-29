@@ -11719,6 +11719,10 @@ function xdg_config_home() {
         return config_home;
     return `${os.homedir()}/.config`;
 }
+function commandMatchesBase(command, searchBase) {
+    const chunks = command.split(' ');
+    return chunks.length > 0 && chunks[0] === searchBase;
+}
 function getBeforeScript() {
     if (IS_LINUX) {
         return core.getInput('before-script-linux') || '';
@@ -12085,8 +12089,9 @@ async function innerMain() {
     }
     let useDocker = false;
     let manylinux = core.getInput('manylinux').replace(/^manylinux_?/, '');
-    if (['build', 'publish'].includes(command)) {
-        if (command === 'publish' && !manylinux) {
+    if (commandMatchesBase(command, 'build') ||
+        commandMatchesBase(command, 'publish')) {
+        if (commandMatchesBase(command, 'publish') && !manylinux) {
             manylinux = 'auto';
         }
         if (process.arch === 'x64' &&
